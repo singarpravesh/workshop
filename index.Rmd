@@ -1,7 +1,5 @@
 ---
-title: ""
-author: "pravesh"
-date: "02/09/2021"
+title: "Work with R"
 output: html_document
 ---
 

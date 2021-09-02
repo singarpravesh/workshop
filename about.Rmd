@@ -1,0 +1,10 @@
+---
+title: "About me"
+output: html_document
+---
+
+<center>![](photo1.jpg){width=500; height=300}</center><br>
+<center>Dr. Pravesh Tamang</center>
+<center>Assistant Professor of Economics</center>
+<center>Presidency University, 86/1, College Street, Kolkata</center>
+<center><pravesh.econ@presiuniv.ac.in></center>

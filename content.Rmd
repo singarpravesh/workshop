@@ -14,10 +14,13 @@ output: html_document
 3. [Working with NSSO data](content/Nsso.html){target="_blank"}
 4. [Regression](content/Regression.html){target="_blank"}
 5. [Diagnostic Tests](content/Diagnostics.html){target="_blank"}
-
-
+<br>
+<br>
+<br>
+<br>
 ## R Scripts
 
 ---
 
 1. [Introduction.R](content/Introduction.R)
+2. [Tidyverse.R](content/Tidyverse.R)

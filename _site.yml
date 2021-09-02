@@ -1,5 +1,5 @@
 navbar: 
-  title: Work with R
+  title: Home
   right:
   - text: Lecture Materials
     href: content.html

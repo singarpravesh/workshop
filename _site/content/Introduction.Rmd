@@ -4,6 +4,7 @@ author: "Pravesh"
 date: "September 2021"
 output: 
   ioslides_presentation:
+    logo: logo.png
     transition: slower
 editor_options: 
   chunk_output_type: console
@@ -35,7 +36,7 @@ library(gapminder)
 
 
 # Introduction | R and RStudio
-- https://github.com/uo-ec607/lectures
+
 
 ## Design of the R system
 - R system is divided into 2 conceptual parts – 

@@ -3,7 +3,7 @@ title: "About me"
 output: html_document
 ---
 
-<center>![](photo1.jpg){width=500; height=300}</center><br>
+<center>![](https://scontent-bom1-2.xx.fbcdn.net/v/t1.6435-9/55845449_277953026449174_1007116925504847872_n.jpg?_nc_cat=100&ccb=1-5&_nc_sid=cdbe9c&_nc_ohc=wnyAB9F_pqIAX_8ckEF&_nc_ht=scontent-bom1-2.xx&oh=aa199990a44008ff03432d3327d50ccb&oe=6157F369){height=500}</center><br>
 <center>Dr. Pravesh Tamang</center>
 <center>Assistant Professor of Economics</center>
 <center>Presidency University, 86/1, College Street, Kolkata</center>

@@ -1,0 +1,262 @@
+---
+title: "Diagnostic Tests"
+author: "Pravesh"
+date: "September 2021"
+output: 
+  ioslides_presentation:
+    logo: logo.png
+    transition: slower
+editor_options: 
+  chunk_output_type: console
+---
+
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 150px;
+}
+```
+
+```{r, echo=FALSE}
+options(scipen = 999, digits = 4)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+```
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(gapminder)
+library(AER)
+```
+
+# Diagnostic tests
+
+---
+
+## Data
+
+```{r, message=FALSE, warning=FALSE}
+library(AER)
+data(Journals, package = "AER")
+journals <- Journals %>% 
+  mutate(citeprice = price/citations) %>% 
+  select(subs, price, citeprice)
+glimpse(journals)
+```
+
+
+---
+
+```{r, echo=FALSE}
+data("CPS1988")
+cps_lm <- lm(log(wage) ~ experience + I(experience^2) + education + ethnicity, data = CPS1988)
+```
+
+
+- The Breusch-Pagan test
+```{r}
+jour_lm <- lm(log(subs) ~ log(citeprice), data = journals)
+# library(lmtest)
+bptest(jour_lm)
+bptest(cps_lm)
+```
+
+---
+
+- The Goldfeld-Quandt test
+```{r}
+# library(lmtest)
+gqtest(jour_lm, order.by = ~ citeprice, data = journals)
+
+```
+
+
+## Testing the functional form. {.smaller}
+
+- Ramsey's RESET
+- Misspecification of functional form (by omitting relevant variables).
+- Let's assess whether second and third powers of $log(citeprice)$ can significantly improve the model. 
+```{r}
+# library(lmtest)
+reset(jour_lm)
+```
+
+- The result is clearly non-significant, and hence no
+misspecification can be detected in this direction.
+
+# Multiple models in `stargazer` with heteroskedasticity-robust standard errors.
+
+
+## Data {.smaller}
+```{r}
+library(AER)
+library(tidyverse)
+library(stargazer)
+
+data(CASchools, package = "AER")
+caschool <- CASchools
+
+caschool <- mutate(caschool, str = students/teachers,
+         testscr = (math + read)/2)
+glimpse(caschool)
+```
+
+
+
+
+## {.smaller}
+
+We shall consider the following models and graphically inspect the correlation and summarise all the regression results in a table.
+$$
+\begin{align*}
+\text{(I)  }\text{testscr} &= \beta_0 + \beta_1\text{str} + u\\
+\text{(II)  }\text{testscr} &= \beta_0 + \beta_1\text{str} + \beta_2\text{english} + u\\
+\text{(III)  }\text{testscr} &= \beta_0 + \beta_1\text{str} + \beta_2\text{english} + \beta_3\text{lunch} + u\\
+\text{(IV)  }\text{testscr} &= \beta_0 + \beta_1\text{str} + \beta_2\text{english} + \beta_3\text{calworks} + u\\
+\text{(V)  }\text{testscr} &= \beta_0 + \beta_1\text{str} + \beta_2\text{english} + \beta_3\text{lunch} + \beta_4\text{calworks} + u\\
+\end{align*}
+$$
+
+where, `testscr`- test score
+`str` - student-teacher ratio
+`english` - percentage of english learners
+`lunch` - percentage of students that qualify for a free or subsidised lunch due to family incomes below a certain threshold.
+`calworks` - percentage of students qualifying for the *calworks* income assistance programme.
+
+## {.smaller}
+
+```{r}
+library(gridExtra)
+p1 <- ggplot(caschool)+
+  geom_point(aes(str, testscr)) +
+  labs(title = "Test Scores and\nStudent teacher ratio")
+p2 <- ggplot(caschool)+
+  geom_point(aes(english, testscr)) +
+  labs(title = "Test Scores and\nPercentage of english learners")
+p3 <- ggplot(caschool)+
+  geom_point(aes(lunch, testscr)) +
+  labs(title = "Test Scores and\nPercentage of students qualifying\nfor free lunch")
+p4 <- ggplot(caschool)+
+  geom_point(aes(calworks, testscr))+
+  labs(title = "Test Scores and\nPercentage of students qualifying \nfor income assistance programme")
+
+grid.arrange(p1, p2, p3, p4, nrow = 2, ncol = 2, top = "Fig:1")
+
+```
+
+
+## {.smaller}
+
+- Using colours
+
+```{r}
+caschool %>% 
+  ggplot(aes(str, testscr))+
+  geom_point(aes(colour = 'str'), alpha = 1)+
+  geom_point(aes(x = english, colour = 'english'), alpha = 0.8) +
+  geom_point(aes(x = lunch, colour = 'lunch'), alpha = 0.6)+
+  geom_point(aes(x = calworks, colour = 'calworks'), alpha = 0.4) +
+  labs(x = "",
+       colour = "Variables",
+       title = "Correlation")
+
+```
+
+
+
+## {.smaller}
+
+-Using plotting characters (shapes)
+```{r}
+caschool %>% 
+  ggplot(aes(str, testscr))+
+  geom_point(aes(shape = 'str'), alpha = 0.5)+
+  geom_point(aes(x = english, shape = 'english'), alpha = 0.5) +
+  geom_point(aes(x = lunch, shape = 'lunch'), alpha = 0.5)+
+  geom_point(aes(x = calworks, shape = 'calworks'), alpha = 0.5) +
+  labs(x = "",
+       shape = "Variables",
+       title = "Correlation")
+
+```
+
+
+## {.smaller} 
+- Non-linear model
+
+```{r}
+ggplot(caschool, aes(x = lunch, y = testscr))+
+  geom_point()+
+  geom_smooth(aes(colour = "linear"),formula = y ~ x, method = "lm", se =FALSE)+
+  geom_smooth(aes(colour = "quadratic"),formula = y ~ x + I(x^2), method = "lm", se = FALSE)+
+  labs(colour = "Models")
+```
+
+
+
+## Heteroskedasticity-robust standard errors.{.smaller}
+Consistent estimation of $\sigma_{\hat\beta_1}$ under heteroskedasticity (**Eicker–Huber–White standard errors**):
+$$
+SE(\hat\beta_1) = \sqrt{\frac{1}{n}.\frac{\frac{1}{n}\sum_{i=1}^{n}(X_i - \overline{X})^2\hat{u_i}^2}{\Big[ \frac{1}{n}\sum_{i=1}^{n}(X_i - \overline{X})^2\Big]^2}}
+$$
+
+Degrees of freedom correction and considered by MacKinnon & White (1985), The difference is that we multiply by $\frac{1}{n-2}$ in the numerator of the previous equation.
+$$
+SE(\hat\beta_1)_{HC1} = \sqrt{\frac{1}{n}.\frac{\frac{1}{n-2}\sum_{i=1}^{n}(X_i - \overline{X})^2\hat{u_i}^2}{\Big[ \frac{1}{n}\sum_{i=1}^{n}(X_i - \overline{X})^2\Big]^2}}
+$$
+
+
+---
+
+- variance-covariance heteroskedasticity-consistent matrix estimation using `vcovHC()` in the `sandwich` package.
+```{r}
+lm_model1 <- lm(testscr ~ str, data = caschool)
+vcovHC(lm_model1, type = "HC1")
+class(vcovHC(lm_model1, type = "HC1"))
+```
+
+
+---
+
+
+- We are interested in the square root of the diagonal elements of this matrix, i.e., the standard error estimates.
+```{r}
+robust_se <- sqrt(diag(vcovHC(lm_model1, type = "HC1")
+))
+robust_se
+```
+
+
+## {.smaller}
+
+```{r,  warning=FALSE}
+# models
+I <- lm(testscr ~ str, data = caschool)
+II <- lm(testscr ~ str + english, data = caschool)
+III <- lm(testscr ~ str + english + lunch, data = caschool)
+IV <- lm(testscr ~ str + english + calworks, data = caschool)
+V <- lm(testscr ~ str + english + lunch + calworks, data = caschool)
+
+# gather all the robust standard error values in a list
+robust_se1 <- list(
+  sqrt(diag(sandwich::vcovHC(I, type = "HC1"))),
+  sqrt(diag(sandwich::vcovHC(II, type = "HC1"))),
+  sqrt(diag(sandwich::vcovHC(III, type = "HC1"))),
+  sqrt(diag(sandwich::vcovHC(IV, type = "HC1"))),
+  sqrt(diag(sandwich::vcovHC(V, type = "HC1")))
+)
+
+## use the `stargazer()` function to represent the output in a tabular form
+stargazer::stargazer(I, II, III, IV, V, type = "text", 
+                     title = "Analysis of caschool dataset.",
+                     se = robust_se1, digits = 3, 
+                     column.labels = c("I", "II", "III", "IV", "V"),
+                     column.sep.width = "1pt",
+                     notes = "Heteroskedasticity robust standard errors are given in parentheses under coefficients.", 
+                     notes.append = TRUE) 
+```

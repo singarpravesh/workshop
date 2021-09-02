@@ -4,6 +4,7 @@ author: "Pravesh"
 date: "September 2021"
 output: 
   ioslides_presentation:
+    logo: logo.png
     transition: slower
 editor_options: 
   chunk_output_type: console
@@ -23,10 +24,15 @@ pre[class] {
 ```{r, echo=FALSE}
 options(scipen = 999, digits = 4)
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+```
+
+```{r, echo=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(gapminder)
 ```
+
 
 
 # <font color="black">Tidyverse | `ggolot2` </font> {data-background=workshop/tidyverse.PNG data-background-size=auto data-background-position=right}

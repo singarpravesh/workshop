@@ -1,6 +1,6 @@
 navbar: 
   title: Introduction to R
-  left:
+  right:
   - text: Lecture Materials
     href: content.html
 output:

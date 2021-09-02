@@ -1,0 +1,90 @@
+---
+title: "Working with NSSO data"
+author: "Pravesh"
+date: "September 2021"
+output: 
+  ioslides_presentation:
+    logo: logo.png
+    transition: slower
+editor_options: 
+  chunk_output_type: console
+---
+
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 150px;
+}
+```
+
+```{r, echo=FALSE}
+options(scipen = 999, digits = 4)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+```
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(gapminder)
+```
+
+
+
+# Tidy NSSO data
+
+## Understanding the data
+
+- Unit Level Data of Periodic Labour Force Survey (PLFS), [July 2019-June 2020](http://mospi.nic.in/unit-level-data-periodic-labour-force-survey-plfs-july-2019-june-2020).
+- Step 1: Read the layout.
+  - PLFS Person Level Data of Re-Visit Schedule
+  - File:  File: PER_RV.txt (PERSON LEVEL)   RECORD LENGTH: 275+1
+
+- Step 2: Read the raw data.
+- Step 3: Tidy the raw data.
+
+
+---
+
+
+```{r}
+# read the layout
+(`layout19-20` <- read_csv("C:/Users/Pravesh/Documents/blogdown/rworkshop/working/workshop/layout19-20.csv", skip = 171, n_max = 104) %>% 
+  select(`Full Name`, `Item /Col.`,`Field Length`, `Byte Position`, X7) %>% 
+  mutate(Name = if_else(
+    duplicated(`Full Name`) == TRUE,
+    str_c(`Full Name`,'+' ,`Item /Col.`),
+    `Full Name`))  %>%  
+  rename(Length = `Field Length`,
+         Position1 = `Byte Position`,
+         Position2 = X7)) 
+```
+
+```{r,, include=FALSE}
+#duplicated(`Full Name`) == TRUE, # check if there are any duplicated values in Full Name. If TRUE then combine it with another character.
+ #   str_c(`Full Name`,'+' ,`Item /Col.`),
+ #   `Full Name`)) 
+
+```
+
+
+---
+
+
+```{r}
+## read the raw data 
+`perrv_19-20` <- read_csv("http://mospi.nic.in/sites/default/files/reports_and_publication/PLFS_2019_2020/PERRV.TXT", col_names = "raw") 
+
+
+## tidy data
+(`tidy_perrv_19-20` <- `perrv_19-20` %>% 
+  separate(col = raw, into = `layout19-20`$Name,
+           sep = cumsum(as.numeric(`layout19-20`$Length)),
+           convert = TRUE))
+```
+
+

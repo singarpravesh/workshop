@@ -1,0 +1,203 @@
+---
+title: "Regression Models"
+author: "Pravesh"
+date: "September 2021"
+output: 
+  ioslides_presentation:
+    logo: logo.png
+    transition: slower
+editor_options: 
+  chunk_output_type: console
+---
+
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 150px;
+}
+```
+
+```{r, echo=FALSE}
+options(scipen = 999, digits = 4)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+```
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(gapminder)
+```
+
+
+
+## Data
+
+```{r, message=FALSE, warning=FALSE}
+library(AER)
+library(tidyverse)
+data(Journals, package = "AER")
+journals <- Journals %>% 
+  mutate(citeprice = price/citations) %>% 
+  select(subs, price, citeprice)
+glimpse(journals)
+```
+
+## Summary
+
+```{r}
+library(summarytools)
+dfSummary(journals, graph.col = FALSE ) 
+```
+
+## Regression model
+
+- Estimate the effect of price per citation $citeprice$ on the number of subscriptions $subs$.
+- Fit the following linear regression model
+$$
+\log(subs)_i = \beta_1 + \beta_2\log(citeprice)_i+ \epsilon_i
+$$
+
+## Plot {.smaller}
+```{r}
+library(ggplot2)
+ggplot(data = journals, aes(log(subs), log(citeprice)))+
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) 
+```
+
+
+## Regression summary
+
+```{r}
+jour_lm <- lm(log(subs) ~ log(citeprice), data = journals)
+summary(jour_lm)
+```
+
+## `lm` object
+```{r}
+class(jour_lm)
+names(jour_lm)
+jour_lm$coefficients
+```
+
+
+## Analysis of variance
+```{r}
+anova(jour_lm)
+```
+
+## Point and interval estimates
+
+```{r}
+# extract the estimated regression coefficients
+coef(jour_lm)
+```
+
+```{r}
+# calculate the confidence intervals
+confint(jour_lm, level = 0.95)
+```
+
+## Testing a linear hypothesis {.smaller}
+
+- Example: Test the hypothesis that the elasticity of number of subscriptions with respect to the price per citation equals $-0.5$, i.e. $H_0:\beta_2=-0.5$.
+
+```{r}
+library(car) # loads with AER
+linearHypothesis(jour_lm, "log(citeprice) = -0.5")
+```
+- Cannot reject $H_0$.
+
+
+
+## Data
+
+```{r}
+data(CPS1988, package = "AER")
+# ?CPS1988
+# summary(CPS1988)
+dfSummary(CPS1988, graph.col = FALSE)
+
+```
+
+
+## Model
+- The regression model we are interested is
+$$
+\log(wage) = \beta_1+ \beta_2experience+ \beta_3experience^2+ \\ \beta_4education+ \beta_5ethnicity + \epsilon
+$$
+
+
+
+
+---
+
+```{r}
+cps_lm <- lm(log(wage) ~ experience + I(experience^2) + education + ethnicity, data = CPS1988)
+summary(cps_lm)
+```
+
+
+## Changing the reference category
+
+```{r}
+CPS1988$ethnicity <- relevel(CPS1988$ethnicity, ref = "afam")
+summary(lm(log(wage) ~ experience + I(experience^2) + education + ethnicity, data = CPS1988))
+```
+
+
+## Comparison of models {.smaller}
+- Is there any difference in the $\log(wage)$ (controlling for $experience$ and $education$) between Caucasian and African-American men?
+- We already have a model `cps_lm` with all the variables including $ethnicity$.
+- Now we need a model without $ethnicity$.
+```{r}
+noeth_lm <- update(cps_lm, formula =  . ~ . - ethnicity)
+summary(noeth_lm)
+```
+
+
+## Comparison of models
+
+```{r}
+anova(cps_lm, noeth_lm )
+```
+The effect of $ethnicity$ is significant at any reasonable level.
+
+
+## Interactions
+
+```{r, echo=FALSE}
+CPS1988$ethnicity <- relevel(CPS1988$ethnicity, ref = "cauc")
+```
+
+
+```{r}
+cps_int <- lm(log(wage) ~ experience + I(experience^2) +
+education * ethnicity, data = CPS1988)
+# or cps_int <- lm(log(wage) ~ experience + I(experience^2) + education + ethnicity + education:ethnicity, data = CPS1988)
+summary(cps_int)
+```
+
+
+## Separate regressions for each levels
+
+```{r}
+summary(
+  update(cps_lm, formula = . ~ . - ethnicity, subset = ethnicity == "afam")
+)
+```
+
+
+---
+
+
+```{r}
+summary(
+  update(cps_lm, formula = . ~ . - ethnicity, subset = ethnicity == "cauc")
+)
+```

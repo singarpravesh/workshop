@@ -23,6 +23,11 @@ pre[class] {
 ```{r, echo=FALSE}
 options(scipen = 999, digits = 4)
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+```
+
+
+```{r, echo=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(gapminder)

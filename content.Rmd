@@ -16,8 +16,7 @@ output: html_document
 
 <br>
 <br>
-<br>
-<br>
+
 
 
 ## R Scripts
@@ -26,3 +25,5 @@ output: html_document
 
 1. [Introduction.R](content/Introduction.R)
 2. [Tidyverse.R](content/Tidyverse.R)
+3. [Regression.R](content/Regression.R)
+4. [Diagnostics.R](content/Diagnostics.R)

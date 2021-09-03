@@ -3276,7 +3276,7 @@ dfSummary(journals, graph.col = FALSE ) </pre>
 \]</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Plot</h2></hgroup><article  id="plot" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Plot</h2></hgroup><article  class="smaller" id="plot">
 
 <pre class = 'prettyprint lang-r'>library(ggplot2)
 ggplot(data = journals, aes(log(subs), log(citeprice)))+
@@ -3354,7 +3354,7 @@ confint(jour_lm, level = 0.95)</pre>
 ## (Intercept)     4.6559  4.8765
 ## log(citeprice) -0.6033 -0.4628</pre>
 
-</article></slide><slide class=""><hgroup><h2>Testing a linear hypothesis</h2></hgroup><article  id="testing-a-linear-hypothesis" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Testing a linear hypothesis</h2></hgroup><article  class="smaller" id="testing-a-linear-hypothesis">
 
 <ul>
 <li>Example: Test the hypothesis that the elasticity of number of subscriptions with respect to the price per citation equals \(-0.5\), i.e. \(H_0:\beta_2=-0.5\).</li>
@@ -3488,7 +3488,7 @@ summary(lm(log(wage) ~ experience + I(experience^2) + education + ethnicity, dat
 ## Multiple R-squared:  0.335,  Adjusted R-squared:  0.335 
 ## F-statistic: 3.54e+03 on 4 and 28150 DF,  p-value: &lt;0.0000000000000002</pre>
 
-</article></slide><slide class=""><hgroup><h2>Comparison of models</h2></hgroup><article  id="comparison-of-models" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Comparison of models</h2></hgroup><article  class="smaller" id="comparison-of-models">
 
 <ul>
 <li>Is there any difference in the \(\log(wage)\) (controlling for \(experience\) and \(education\)) between Caucasian and African-American men?</li>

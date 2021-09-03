@@ -3334,7 +3334,7 @@ se =list( sqrt(diag(sandwich::vcovHC(lm_fertil1, type = &quot;HC1&quot;)))),
 ## ================================================
 ## Note:                *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</pre>
 
-</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section" class="smaller">
+</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  class="smaller" id="section">
 
 <ul>
 <li>The base year is 1972. The coefficients on the year dummy variables show a sharp drop in fertility in the early 1980s. For example, the coefficient on \(y82\) implies that, holding education, age, and other factors fixed, a woman had on average 0.52 less children, or aboutone-half a child, in 1982 than in 1972. This is a very large drop: holding educ, age, and the other factors fixed, 100 women in 1982 are predicted to have about 52 fewer children than 100 comparable women in 1972.</li>
@@ -3434,7 +3434,7 @@ se = list(sqrt(diag(vcovHC(e13.2PooledModel, type = &quot;HC1&quot;)))))</pre>
 ## ==============================================================
 ## Note:                              *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</pre>
 
-</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section-1" class="smaller">
+</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  class="smaller" id="section-1">
 
 <p>How the return to education and the gender gap have changed from 1978 to 1985?</p>
 
@@ -3444,7 +3444,7 @@ se = list(sqrt(diag(vcovHC(e13.2PooledModel, type = &quot;HC1&quot;)))))</pre>
 <li>In 1985, the gap in log(wage) is 2.317 - .085 = 2.232. Therefore, the gender gap appears to have fallen from 1978 to 1985 by about 8.5 percentage points.</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section-2" class="smaller">
+</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  class="smaller" id="section-2">
 
 <p><u> Difference-in-differences estimator</u></p>
 
@@ -3462,7 +3462,7 @@ se = list(sqrt(diag(vcovHC(e13.2PooledModel, type = &quot;HC1&quot;)))))</pre>
 
 <p><em>The hypothesis is that the price of houses located near the incinerator would fall relative to the price of more distant houses.</em></p>
 
-</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section-3" class="smaller">
+</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  class="smaller" id="section-3">
 
 <ul>
 <li>We estimate the following model; \[
@@ -3472,7 +3472,7 @@ rprice = \beta_0 + \delta_0y81 + \beta_1nearinc + \delta_1y81\cdot nearinc + u
 
 <p>where, \(\beta_0\) is the average price of a home not near the incinerator in 1978. <br> \(\delta_0\) captures the changes in all housing values from 1978 to 1981. <br> \(\delta_1\) <strong>(known as the difference-in-differences)</strong> measures the decline in housing values due to the new incinerator.</p>
 
-</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section-4" class="smaller">
+</article></slide><slide class=""><hgroup><h2></h2></hgroup><article  class="smaller" id="section-4">
 
 <pre class = 'prettyprint lang-r'>library(stargazer); library(sandwich); library(lmtest)
 e13.3PooledModel1 &lt;- lm(rprice ~ y81 + nearinc + y81*nearinc, data = kielmc)

@@ -38,6 +38,7 @@ library(gapminder)
 # Introduction | R and RStudio
 
 
+
 ## Design of the R system
 - R system is divided into 2 conceptual parts – 
     + The “base” R system that you download from CRAN https://cran.r-project.org/

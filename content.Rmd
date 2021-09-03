@@ -11,9 +11,10 @@ output: html_document
 
 1. [Introduction](content/Introduction.html){target="_blank"}
 2. [Tidyverse](content/Tidyverse.html){target="_blank"}
-3. [Working with NSSO data](content/Nsso.html){target="_blank"}
-4. [Regression](content/Regression.html){target="_blank"}
-5. [Diagnostic Tests](content/Diagnostics.html){target="_blank"}
+3. [Regression](content/Regression.html){target="_blank"}
+4. [Diagnostic Tests](content/Diagnostics.html){target="_blank"}
+5. [Panel Data Regression](content/Panel.html){target="_blank"}
+
 <br>
 <br>
 <br>

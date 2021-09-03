@@ -1,0 +1,198 @@
+---
+title: "Panel Data"
+author: "Pravesh"
+date: "September 2021"
+output: 
+  ioslides_presentation:
+    logo: logo.png
+    transition: slower
+editor_options: 
+  chunk_output_type: console
+---
+
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 150px;
+}
+```
+
+```{r, echo=FALSE}
+options(scipen = 999, digits = 4)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+```
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(gapminder)
+library(wooldridge)
+library(lmtest)
+
+```
+
+
+# Pooling Independent Cross Sections across Time
+
+---
+
+Why pool cross section data?
+
+- One reason for using independently pooled cross sections is to increase the sample size. 
+- By pooling random samples drawn from the same population, but at different points in time, we can get more precise estimators and test statistics with more power.
+- To reflect the fact that the population may have different distributions in different time periods, we allow the intercept to differ across periods, usually years. 
+- This is easily accomplished by including dummy variables for all but one year, where the earliest year in the sample is usually chosen as the base year.
+
+---
+
+**Women's fertility over time**
+
+```{r, warning=FALSE, message=FALSE}
+library(wooldridge)
+data("fertil1")
+```
+
+- Question: <u>After controlling for other observable factors, what has happened to fertility rates over time?</u>
+- The factors we control for are years of *education*, *age*, *race*, *region* of the country where living at age 16, and *living environment* at age 16.
+
+```{r, warning=FALSE, message=FALSE}
+table(fertil1$year)
+```
+
+
+---
+
+
+```{r}
+# regression
+lm_fertil1 <- lm(kids ~ educ + age + I(age^2) + as.factor(black) + as.factor(east) + 
+                   as.factor(northcen) + as.factor(west) + as.factor(farm) 
++ as.factor(othrural) + as.factor(town) + as.factor(smcity) +as.factor(year), 
+data = fertil1)
+# robust se
+stargazer::stargazer(lm_fertil1,
+se =list( sqrt(diag(sandwich::vcovHC(lm_fertil1, type = "HC1")))),
+                      type = "text")
+```
+
+
+
+## {.smaller}
+
+
+
+- The base year is 1972. The coefficients on the year dummy variables show a sharp drop in fertility in the early 1980s. For example, the coefficient on $y82$ implies that, holding education, age, and other factors fixed, a woman had on average 0.52 less children, or aboutone-half a child, in 1982 than in 1972. This is a very large drop: holding educ, age, and the other factors fixed, 100 women in 1982 are predicted to have about 52 fewer children than 100 comparable women in 1972. 
+- Since we are controlling for education, this drop is separate from the decline in fertility that is due to the increase in average education levels. (The average years of education are 12.2 for 1972 and 13.3 for 1984.) 
+- Women with more education have fewer children, and the estimate is very statistically significant.
+- Age has a diminishing effect on fertility. (The turning point in the quadratic is at about $age = 46$, by which time most women have finished having children.)
+
+
+---
+
+
+Next Example:**Changes in the return to education and the gender wage gap**
+
+- Dataset: `cps78_85`
+- There are 550 people in the sample in 1978 and a different set of 534 people in 1985.
+- Objective: <u>Examine how the return to education and the gender gap have changed from 1978 to 1985. </u>
+- The model we shall estimate:
+$$
+{\small\begin{align}
+log(wage) &= \beta_0 + \beta_1y85+ \beta_2educ + \beta_3y85\cdot educ + \beta_4exper \\&+ \beta_5exper^2 + \beta_6union + \beta_7female + \beta_8y85\cdot female + u
+\end{align}}
+$$
+
+---
+
+```{r}
+data("cps78_85")
+str(cps78_85)
+```
+
+---
+
+
+```{r, message=FALSE, warning=FALSE}
+library(sandwich); library(lmtest); library(stargazer)
+# the model
+e13.2PooledModel <- lm(lwage ~ as.factor(y85) + educ + as.factor(y85)*educ + 
+exper + I(exper^2) + as.factor(union) + as.factor(female) +
+  as.factor(y85)*as.factor(female), data = cps78_85) 
+
+stargazer(e13.2PooledModel, type = "text", 
+se = list(sqrt(diag(vcovHC(e13.2PooledModel, type = "HC1")))))
+```
+
+
+
+
+## {.smaller}
+
+
+How the return to education and the gender gap have changed from 1978 to 1985?
+
+- The return to education in 1978 is estimated to be about 7.5%; the return to education in 1985 is about 1.85 percentage points higher, or about 9.35%. 
+- What about the gender gap? In 1978, other things being equal, a woman earned about 31.7% less than a man (27.2% is the more accurate estimate). 
+- In 1985, the gap in log(wage) is 2.317 - .085 = 2.232. Therefore, the gender gap appears to have fallen from 1978 to 1985 by about 8.5 percentage points.
+
+
+
+## {.smaller}
+
+
+<u> Difference-in-differences estimator</u>
+
+**Effect of a garbage incinerator's location on housing prices**
+
+- The story:
+
+*Kiel and McClain (1995) studied the effect that a new garbage incinerator had on housing values in North Andover, Massachusetts. They used many years of data and a fairly complicated econometric analysis. We will use two years of data and some simplified models, but our analysis is similar.*
+
+*The rumor that a new incinerator would be built in North Andover began after 1978, and construction began in 1981. The incinerator was expected to be in operation soon after the start of construction; the incinerator actually began operating in 1985.*
+
+*We will use data on prices of houses that sold in 1978 and another sample on those that sold in 1981.* 
+
+*The hypothesis is that the price of houses located near the incinerator would fall relative to the price of more distant houses.*
+
+
+## {.smaller}
+
+ - We estimate the following model;
+$$
+rprice = \beta_0 + \delta_0y81 + \beta_1nearinc + \delta_1y81\cdot nearinc + u
+$$
+
+where, $\beta_0$ is the average price of a home not near the incinerator in 1978. <br>
+$\delta_0$ captures the changes in all housing values from 1978 to 1981. <br>
+$\delta_1$ **(known as the difference-in-differences)** measures the decline in housing values due to the new incinerator.
+
+
+
+## {.smaller}
+
+
+
+```{r, message=FALSE, warning=FALSE}
+library(stargazer); library(sandwich); library(lmtest)
+e13.3PooledModel1 <- lm(rprice ~ y81 + nearinc + y81*nearinc, data = kielmc)
+e13.3PooledModel2 <- lm(rprice ~ y81 + nearinc + y81*nearinc + age + I(age^2), data = kielmc)
+e13.3PooledModel3 <- lm(rprice ~ y81 + nearinc + y81*nearinc + age + I(age^2) + intst 
+           + land +  area + rooms + baths, data = kielmc)
+
+stargazer(e13.3PooledModel1, e13.3PooledModel2, e13.3PooledModel3,
+se = list(sqrt(diag(vcovHC(e13.3PooledModel1, type = "HC1"))),
+sqrt(diag(vcovHC(e13.3PooledModel2, type = "HC1"))),
+sqrt(diag(vcovHC(e13.3PooledModel3, type = "HC1")))),
+digits = 3, type = "text")
+```
+
+
+
+
+
+

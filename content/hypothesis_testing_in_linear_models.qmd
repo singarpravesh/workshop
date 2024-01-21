@@ -1,0 +1,129 @@
+---
+title: "Hypothesis Testing in Linear Models"
+format: html
+code-link: true
+editor_options: 
+  chunk_output_type: inline
+toc: true
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, warning = FALSE
+)
+```
+
+## Incremental contribution of an explanatory variable
+
+We want to test whether `experience` has any significant impact on the wage apart from `education`.
+
+```{r}
+library(AER)
+data("CPS1985")
+cps85 <- CPS1985
+
+wage_model1 <- lm(log(wage) ~ education, data = cps85)
+wage_model2 <- lm(log(wage) ~ education + experience, data = cps85)
+
+anova(wage_model1, wage_model2)
+
+```
+
+Check
+
+```{r}
+anova(wage_model1) |> names()
+rss_r <- anova(wage_model1)$`Sum Sq`[2]
+rss_ur <- anova(wage_model2)$`Sum Sq`[3]
+m <- 1; n <- nrow(cps85); k <- 3
+
+F_cal <- ((rss_r - rss_ur)/m)/((rss_ur)/(n - k)); F_cal
+F_cri <- qf(p = 0.05, df1 = m, df2 = n - k)# Calculate critical ot table F value
+F_cri
+
+```
+
+## Testing equality between two regression coefficients
+
+whether the impact of education and experience are the same or not i.e. $H_0: \beta_1 = \beta_2$ or $\beta_1 - \beta_2 = 0$
+
+```{r}
+linearHypothesis(wage_model2, "education - experience = 0")
+```
+
+Now, if $\beta_1 > \beta_2$ we can infer that the contribution of `education` is more than that of `experience`, and vice-versa.
+
+```{r}
+summary(wage_model2)
+```
+
+## Testing the validity of linear restriction
+
+We use the Restricted Least Square Approach.
+
+```{r}
+library(Ecdat)
+data(Metal)
+str(Metal)
+metal <- Metal
+```
+
+Our log-log model is: $$
+log(Y_i) = \beta_0 + \beta_1log(L_i) + \beta_2log(K_i)+ u_i
+$$
+
+where, $H_0:\beta_1 + \beta_2 = 1$ $\implies$ Constant Returns to Scale
+
+So, we want to check whether the production function exhibits CRS?
+
+```{r}
+# unrestricted  model
+metal_model1 <- lm(log(va) ~ log(labor) + log(capital), data = metal)
+
+# restricted model
+metal_model2 <- lm(log(va/capital) ~ log(labor/capital) , data = metal)
+
+# F stat calculation and comparison
+anova(metal_model1) |> names()
+rss_r <- anova(metal_model2)$`Sum Sq`[2]
+rss_ur <- anova(metal_model1)$`Sum Sq`[3]
+m <- 1; n <- nrow(metal); k <- 3
+
+F_cal <- ((rss_r - rss_ur)/m)/((rss_ur)/(n - k)); F_cal
+F_cri <- qf(p = 0.1, df1 = m, df2 = n - k)# Calculate critical ot table F value
+F_cri
+```
+
+## Structural Break Analysis using the F-stat (also known as the Chow test)
+
+Let's look at the data first.
+
+```{r}
+# get the time series data
+data("USMacroG", package = "AER")
+class(USMacroG)
+
+# convert the data type to tsibble
+library(tsibble)
+quarterly_us_macro <- as_tsibble(USMacroG)
+
+# convert the quarterly data to yearly data
+yearly_us_macro <- quarterly_us_macro |>
+  pivot_wider(names_from = key,
+              values_from = value) |> 
+  select(gdp, saving = invest) |> 
+  mutate(year = lubridate::year(index)) |> 
+  index_by(year) |> 
+  group_by(year) |> 
+  summarize(gdp = mean(gdp), saving = mean(saving)) |> 
+  update_tsibble(key = c(gdp, saving), index = year)
+```
+
+There was a recession in the US economy in the year 1982. Therefore, we shall assume one structural break in the year 1982.
+
+```{r}
+yearly_us_macro |> 
+  ggplot(aes(year, saving))+
+  geom_line()+
+  geom_line(aes(y = gdp))
+```
